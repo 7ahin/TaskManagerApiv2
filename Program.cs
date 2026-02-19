@@ -13,7 +13,6 @@ builder.Services.AddDbContext<TodoContext>(opt => opt.UseInMemoryDatabase("TodoL
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
