@@ -22,15 +22,10 @@ namespace TaskManagerApi.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<TodoItem>> GetTodoItem(long id)
+        public async Task<ActionResult<TodoItem>> GetTodoItem(string id)
         {
             var todoItem = await _context.TodoItems.FindAsync(id);
-
-            if (todoItem == null)
-            {
-                return NotFound();
-            }
-
+            if (todoItem == null) return NotFound();
             return todoItem;
         }
 
@@ -39,17 +34,13 @@ namespace TaskManagerApi.Controllers
         {
             _context.TodoItems.Add(todoItem);
             await _context.SaveChangesAsync();
-
             return CreatedAtAction(nameof(GetTodoItem), new { id = todoItem.Id }, todoItem);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutTodoItem(long id, TodoItem todoItem)
+        public async Task<IActionResult> PutTodoItem(string id, TodoItem todoItem)
         {
-            if (id != todoItem.Id)
-            {
-                return BadRequest();
-            }
+            if (id != todoItem.Id) return BadRequest();
 
             _context.Entry(todoItem).State = EntityState.Modified;
 
@@ -59,35 +50,25 @@ namespace TaskManagerApi.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!TodoItemExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                if (!TodoItemExists(id)) return NotFound();
+                else throw;
             }
 
             return NoContent();
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteTodoItem(long id)
+        public async Task<IActionResult> DeleteTodoItem(string id)
         {
             var todoItem = await _context.TodoItems.FindAsync(id);
-            if (todoItem == null)
-            {
-                return NotFound();
-            }
+            if (todoItem == null) return NotFound();
 
             _context.TodoItems.Remove(todoItem);
             await _context.SaveChangesAsync();
-
             return NoContent();
         }
 
-        private bool TodoItemExists(long id)
+        private bool TodoItemExists(string id)
         {
             return _context.TodoItems.Any(e => e.Id == id);
         }
