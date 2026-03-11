@@ -1,16 +1,18 @@
-﻿namespace TaskManagerApi.Models
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace TaskManagerApi.Models
 {
     public class TodoItem
     {
-        public string Id { get; set; } = Guid.NewGuid().ToString();
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)] 
+        public int Id { get; set; }
+        //public long Id { get; set; } 
         public string? Name { get; set; }
         public bool IsComplete { get; set; }
 
-        public string? Priority { get; set; }
-        public DateTime? DueDate { get; set; }
-
-        public DateTime? StartDate { get; set; }
-
-        public string? Status { get; set; }
+        public int? UserId { get; set; }
+        public User? User { get; set; }
     }
 }

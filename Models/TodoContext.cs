@@ -10,6 +10,7 @@ namespace TaskManagerApi.Models
         }
 
         public DbSet<TodoItem> TodoItems { get; set; } = null!;
+        public DbSet<User> Users { get; set; } = null!;
         public DbSet<Goal> Goals { get; set; } = null!; 
     }
 }
