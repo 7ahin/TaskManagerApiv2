@@ -61,6 +61,22 @@ builder.Services.AddDbContext<TodoContext>(options =>
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var config = services.GetRequiredService<IConfiguration>();
+    var db = services.GetRequiredService<TodoContext>();
+    var provider = config["DbProvider"]?.Trim().ToLowerInvariant();
+    if (provider == "postgres" || provider == "postgresql")
+    {
+        db.Database.EnsureCreated();
+    }
+    else
+    {
+        db.Database.Migrate();
+    }
+}
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
