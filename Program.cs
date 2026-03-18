@@ -19,7 +19,14 @@ builder.Services.AddCors(options =>
             }
             else
             {
-                policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+                if (!builder.Environment.IsDevelopment())
+                {
+                    throw new InvalidOperationException("AllowedOrigins must be set in non-development environments.");
+                }
+
+                policy.WithOrigins("http://localhost:5173", "http://localhost:3000")
+                    .AllowAnyHeader()
+                    .AllowAnyMethod();
             }
         });
 });
@@ -29,7 +36,24 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddDbContext<TodoContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddDbContext<TodoContext>(options =>
+{
+    var provider = builder.Configuration["DbProvider"]?.Trim().ToLowerInvariant();
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+    if (string.IsNullOrWhiteSpace(provider))
+    {
+        provider = connectionString?.Contains("Host=", StringComparison.OrdinalIgnoreCase) == true ? "postgres" : "sqlserver";
+    }
+
+    if (provider == "postgres" || provider == "postgresql")
+    {
+        options.UseNpgsql(connectionString);
+        return;
+    }
+
+    options.UseSqlServer(connectionString);
+});
 
 var app = builder.Build();
 
