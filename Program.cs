@@ -52,7 +52,28 @@ builder.Services.AddDbContext<TodoContext>(options =>
 
     if (provider == "postgres" || provider == "postgresql")
     {
-        options.UseNpgsql(connectionString);
+        string NormalizePostgres(string cs)
+        {
+            if (cs?.StartsWith("postgres://", StringComparison.OrdinalIgnoreCase) == true ||
+                cs?.StartsWith("postgresql://", StringComparison.OrdinalIgnoreCase) == true)
+            {
+                var uri = new Uri(cs);
+                var userInfo = Uri.UnescapeDataString(uri.UserInfo ?? "");
+                var split = userInfo.Split(':', 2);
+                var username = split.Length > 0 ? split[0] : "";
+                var password = split.Length > 1 ? split[1] : "";
+                var db = uri.AbsolutePath.Trim('/'); 
+                var host = uri.Host;
+                var port = uri.Port > 0 ? uri.Port : 5432;
+                var ssl = host.EndsWith(".internal", StringComparison.OrdinalIgnoreCase)
+                    ? "SSL Mode=Disable"
+                    : "SSL Mode=Require;Trust Server Certificate=true";
+                return $"Host={host};Port={port};Database={db};Username={username};Password={password};{ssl}";
+            }
+            return cs ?? "";
+        }
+
+        options.UseNpgsql(NormalizePostgres(connectionString));
         return;
     }
 
