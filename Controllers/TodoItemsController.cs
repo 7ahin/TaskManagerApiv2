@@ -94,8 +94,8 @@ namespace TaskManagerApi.Controllers
             return NoContent();
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteTodoItem(long id)
+        [HttpDelete("{id:int}")]
+        public async Task<IActionResult> DeleteTodoItem(int id)
         {
             var userId = GetCurrentUserId();
             if (userId == null) return Unauthorized();
