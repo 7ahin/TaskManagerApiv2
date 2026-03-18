@@ -19,14 +19,18 @@ builder.Services.AddCors(options =>
             }
             else
             {
-                if (!builder.Environment.IsDevelopment())
+                if (builder.Environment.IsDevelopment())
                 {
-                    throw new InvalidOperationException("AllowedOrigins must be set in non-development environments.");
+                    policy.WithOrigins("http://localhost:5173", "http://localhost:3000")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
                 }
-
-                policy.WithOrigins("http://localhost:5173", "http://localhost:3000")
-                    .AllowAnyHeader()
-                    .AllowAnyMethod();
+                else
+                {
+                    policy.SetIsOriginAllowed(_ => false)
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
+                }
             }
         });
 });
